@@ -41,7 +41,7 @@ router.post('/api/events', ensureAuthenticated, async (req: IAuthRequest, res: R
 router.put('/api/events/:eventId', ensureAuthenticated, async (req: Request, res: Response) => {
     try {
         const event = await updateEvent(req.params.eventId, req.body);
-        if (!event || !event.length) {
+        if (!event) {
             res.status(HTTP_STATUS_CODES.NOT_FOUND);
         } else {
             res.status(HTTP_STATUS_CODES.ACCEPTED);

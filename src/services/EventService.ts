@@ -17,7 +17,7 @@ export const getEvents = async (userId: number): Promise<any | undefined> => {
 
     try {
         const eventRepo = conn.getRepository(Event);
-        const events = await eventRepo.find({user_id: userId});
+        const events = await eventRepo.find({where: {user_id: userId}, order: {created_date: "DESC"}});
         return classToPlain(events);
     } catch (error) {
         debug(debugErrorMsg, error);
