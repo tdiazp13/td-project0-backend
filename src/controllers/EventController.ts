@@ -24,12 +24,12 @@ const router = Router();
 router.post('/api/events', ensureAuthenticated, async (req: IAuthRequest, res: Response) => {
     try {
         const event = await createEvent(req.body, req.user||0);
-        if (!event || !event.length) {
+        if (!event) {
             res.status(HTTP_STATUS_CODES.NOT_FOUND);
         } else {
-            res.status(HTTP_STATUS_CODES.OK);
+            res.status(HTTP_STATUS_CODES.CREATED);
         }
-        res.status(201).send(event || {});
+        res.send(event || {});
 
     } catch (error) {
         const statusCode = error.status || HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR;
@@ -41,12 +41,12 @@ router.post('/api/events', ensureAuthenticated, async (req: IAuthRequest, res: R
 router.put('/api/events/:eventId', ensureAuthenticated, async (req: Request, res: Response) => {
     try {
         const event = await updateEvent(req.params.eventId, req.body);
-        if (!event || !event.length) {
+        if (!event) {
             res.status(HTTP_STATUS_CODES.NOT_FOUND);
         } else {
-            res.status(HTTP_STATUS_CODES.OK);
+            res.status(HTTP_STATUS_CODES.ACCEPTED);
         }
-        res.status(202).send(event || {});
+        res.send(event || {});
     } catch (error) {
         const statusCode = error.status || HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR;
         const errorMsg = ErrorHandler.getErrorResponse(error.message, 'ERROR_UPDATING_EVENTS', statusCode);
