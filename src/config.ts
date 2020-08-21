@@ -1,5 +1,5 @@
 export default {
-    PORT: process.env.PORT || '8096',
+    PORT: process.env.PORT || '8080',
     DATABASE_USER: process.env.DATABASE_USER || 'user',
     DATABASE_PASSWORD: process.env.DATABASE_PASSWORD || 'password',
     DATABASE_HOST: process.env.DATABASE_HOST || 'localhost',

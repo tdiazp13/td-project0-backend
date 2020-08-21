@@ -12,7 +12,7 @@ const debug = debugLib('td:server');
 /**
  * Get port from environment and store in Express.
  */
-const port: string | number | false = normalizePort(process.env.PORT || '8097');
+const port: string | number | false = normalizePort(process.env.PORT || '8080');
 app.set('port', port);
 debug('Port set to:', port);
 /**
