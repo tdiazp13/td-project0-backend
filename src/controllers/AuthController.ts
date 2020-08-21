@@ -14,12 +14,12 @@ const router = Router();
 router.post('/api/create-user', async (req: Request, res: Response) => {
     try {
         const user = await createUser(req.body);
-        if (!user || !user.length) {
+        if (!user) {
             res.status(HTTP_STATUS_CODES.NOT_FOUND);
         } else {
-            res.status(HTTP_STATUS_CODES.OK);
+            res.status(HTTP_STATUS_CODES.CREATED);
         }
-        res.status(201).send(user || {});
+        res.send(user || {});
     } catch (error) {
         const statusCode = error.status || HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR;
         const errorMsg = ErrorHandler.getErrorResponse(error.message, 'ERROR_CREATING_USER', statusCode);
