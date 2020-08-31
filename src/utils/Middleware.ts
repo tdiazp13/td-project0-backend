@@ -17,7 +17,7 @@ const ensureAuthenticated = (req: IAuthRequest, res: Response, next: NextFunctio
 
     try {
         const user = jwt.verify(token, config.JWT);
-        req.user = (user as {userId:number}).userId;
+        req.company = (user as {companyId:number}).companyId;
         next();
     } catch(err) {
         return res.status(403).send({message: 'Invalid Token'});

@@ -1,32 +1,37 @@
 import { Request, Response, Router } from 'express';
-import { createUser, validateLogin } from '../services/AuthService';
+import { createCompany, validateLogin } from '../services/AuthService';
 import HTTP_STATUS_CODES from 'http-status';
 import { ErrorHandler } from '../utils/ErrorHandler';
 
 const router = Router();
 
 /**
- * Controlador para Autenticación
- * @author Tania Díaz
+ * Controller for Authentication
  * @version 1.0
  */
 
-router.post('/api/create-user', async (req: Request, res: Response) => {
+/**
+ * Method to create new company and register admin
+ */
+router.post('/api/create-company', async (req: Request, res: Response) => {
     try {
-        const user = await createUser(req.body);
-        if (!user) {
+        const company = await createCompany(req.body);
+        if (!company) {
             res.status(HTTP_STATUS_CODES.NOT_FOUND);
         } else {
             res.status(HTTP_STATUS_CODES.CREATED);
         }
-        res.send(user || {});
+        res.send(company || {});
     } catch (error) {
         const statusCode = error.status || HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR;
-        const errorMsg = ErrorHandler.getErrorResponse(error.message, 'ERROR_CREATING_USER', statusCode);
+        const errorMsg = ErrorHandler.getErrorResponse(error.message, 'ERROR_CREATING_COMPANY', statusCode);
         res.status(statusCode).send(errorMsg);
     }
 });
 
+/**
+ * Method to authenticate admin
+ */
 router.post('/api/api-auth', async (req: Request, res: Response) => {
     try {
         const accessToken = await validateLogin(req.body);

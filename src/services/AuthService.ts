@@ -3,61 +3,59 @@ import ILoginDef from '../models/ILoginDef';
 import jwt from 'jsonwebtoken';
 import config from '../config';
 import bcrypt from 'bcrypt';
-import { getBDConnection } from '../utils/Comms';
-import { User } from '../entities/UserEntity';
 import { debugErrorMsg } from '../utils/ErrorHandler';
 import { plainToClass } from 'class-transformer';
-import IUserDef from '../models/IUserDef';
+import { getManager } from 'typeorm';
+import { CompanyEntity } from '../entities/CompanyEntity';
+import ICompanyDef from '../models/ICompanyDef';
 
-const debug = debugLib('td:AuthService');
+const debug = debugLib('dm:AuthService');
 
-export const createUser = async (user: IUserDef): Promise<any | undefined> => {
-    debug('[NEW] Create User');
-    const conn = await getBDConnection();
+export const createCompany = async (company: ICompanyDef): Promise<any | undefined> => {
+    debug('[NEW] Create Company');
 
     try {
-        user.password = bcrypt.hashSync(user.password, 10);
+        company.admin_password = bcrypt.hashSync(company.admin_password, 10);
 
-        const userRepo = conn.getRepository(User);
-        const existingUser = await userRepo.findOne({where: [{username: user.username} , {email: user.email}]});
+        const companyRepo = getManager().getRepository(CompanyEntity);
+        const existingAdmin= await companyRepo.findOne({admin_email: company.admin_email});
 
-        if (existingUser) {
-            debug('[NEW] User already exists');
-            return Promise.reject({ status: 400, message: 'Invalid User' });
+        if (existingAdmin) {
+            debug('[NEW] Admin already exists');
+            return Promise.reject({ status: 400, message: 'Invalid Admin' });
         } else {
-            const userSaved = await userRepo.save(user);
-            debug('[NEW] User created');
-            return plainToClass(User, userSaved);
+            const companySaved = await companyRepo.save(company);
+            companySaved.url = `${ company.company_name.replace(/\s+/g,'') }-${ companySaved.id }`;
+
+            const companyUpdated = await companyRepo.save(companySaved);
+            // const companyUpdated = await companyRepo.update(companySaved.id, { url: url});
+            debug('[NEW] Company created');
+            return plainToClass(CompanyEntity, companyUpdated);
         }
     } catch (error) {
-        return Promise.reject({ error, message: 'Could not create user' });
-    } finally {
-        await conn.close();
+        return Promise.reject({ error, message: 'Could not create Company' });
     }
 };
 
 export const validateLogin = async (login: ILoginDef): Promise<string | undefined> => {
     debug('[NEW] Login request');
-    const conn = await getBDConnection();
 
     try {
-        const userRepo = conn.getRepository(User);
-        const user = await userRepo.findOne({email: login.email});
+        const companyRepo = getManager().getRepository(CompanyEntity);
+        const company = await companyRepo.findOne({admin_email: login.email});
 
-        if(user) {
-            if (bcrypt.compareSync(login.password, user.password)) {
-                const tokenBody = {userId: user.id};
+        if(company) {
+            if (bcrypt.compareSync(login.password, company.admin_password)) {
+                const tokenBody = {companyId: company.id};
                 return jwt.sign(tokenBody, config.JWT, {expiresIn: '1d'});
             } else {
                 return Promise.reject({ status: 400, message: 'Invalid Credentials' });
             }
         } else {
-            return Promise.reject({ status: 400, message: 'Invalid User' });
+            return Promise.reject({ status: 400, message: 'Invalid Admin' });
         }
     } catch (error) {
         debug(debugErrorMsg, error);
         return Promise.reject({ error, message: 'Could not validate login' });
-    } finally {
-        await conn.close();
     }
 };

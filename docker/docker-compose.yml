@@ -1,9 +1,10 @@
 version: '3.3'
 services:
   db:
-    image: tdsql
+    build: ./db
+    image: dmsql
     command: mysqld --default-authentication-plugin=mysql_native_password
-    container_name: td-container
+    container_name: dmsql
     restart: always
     environment:
       MYSQL_DATABASE: 'db'
@@ -12,3 +13,12 @@ services:
       MYSQL_ROOT_PASSWORD: 'rootpassword'
     ports:
       - '3306:3306'
+  node:
+    build: ../
+    image: dmjs
+    container_name: dmjs
+    environment:
+      PORT: '8080'
+      JWT: 'LCxGH3NuxSpu7FLs'
+    ports:
+      - '8080:8080'

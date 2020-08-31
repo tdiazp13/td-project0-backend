@@ -6,13 +6,16 @@
 import debugLib from 'debug';
 import http from 'http';
 import app from '../app';
+import { createConnection } from 'typeorm';
+import config from '../config';
 
 const debug = debugLib('td:server');
 
+createConnection().then(async connection => {
 /**
  * Get port from environment and store in Express.
  */
-const port: string | number | false = normalizePort(process.env.PORT || '8080');
+const port: string | number | false = normalizePort(config.PORT);
 app.set('port', port);
 debug('Port set to:', port);
 /**
@@ -83,4 +86,4 @@ function onListening() {
   debug(`Listening on ${bind}`);
 }
 
-export default server;
+});

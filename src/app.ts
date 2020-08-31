@@ -4,15 +4,19 @@ import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 
 import AuthController from './controllers/AuthController';
-import EventController from './controllers/EventController';
+import ProjectController from './controllers/ProjectController';
+import DesignController from './controllers/DesignController';
+import multer from 'multer';
 
 const app = express();
+const upload = multer();
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(upload.array('image'));
 
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
@@ -27,5 +31,6 @@ app.use((req, res, next) => {
 });
 
 app.use(AuthController);
-app.use(EventController);
+app.use(ProjectController);
+app.use(DesignController);
 export default app;
